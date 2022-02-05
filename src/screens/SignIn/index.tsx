@@ -52,6 +52,7 @@ const SignIn: React.FC = () => {
               secureTextEntry
               value={password}
               onChangeText={setPassword}
+              onSubmitEditing={() => handleSignIn()}
             />
             <S.ForgotPasswordButton onPress={() => handleForgotPassword()}>
               <S.ForgotPasswordLabel>Esqueci minha senha</S.ForgotPasswordLabel>

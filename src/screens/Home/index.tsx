@@ -13,10 +13,12 @@ import { ProductCard, ProductProps } from "src/components/ProductCard";
 
 import firestore from "@react-native-firebase/firestore";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useAuth } from "src/hooks/auth";
 
 const Home: React.FC = () => {
   const theme = useTheme();
   const safeArea = useSafeAreaInsets();
+  const { signOut } = useAuth();
 
   const { navigate } = useNavigation();
 
@@ -84,7 +86,7 @@ const Home: React.FC = () => {
           <S.GreetingText>Olá, Admin</S.GreetingText>
         </S.Greeting>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={signOut}>
           <MaterialIcons name="logout" color={theme.COLORS.TITLE} size={24} />
         </TouchableOpacity>
       </S.Header>
