@@ -7,11 +7,10 @@ import { ThemeProvider } from "styled-components/native";
 import AppLoading from "expo-app-loading";
 
 import theme from "./src/theme";
-import { SignIn } from "./src/screens/SignIn";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "src/hooks/auth";
-import { Product } from "src/screens/Product";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Routes } from "src/routes";
 
 export default function App() {
   const [loaded] = useFonts({
@@ -28,7 +27,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <StatusBar style="light" />
         <AuthProvider>
-          <Product />
+          <Routes />
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
