@@ -115,7 +115,7 @@ const Home: React.FC = () => {
       />
       <S.NewProductButton
         style={{
-          marginBottom: safeArea.bottom + 5,
+          marginBottom: safeArea.bottom,
         }}
         title="Cadastra Pizza"
         type="secondary"

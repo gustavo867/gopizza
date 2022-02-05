@@ -13,8 +13,8 @@ import { useAuth } from "src/hooks/auth";
 const SignIn: React.FC = () => {
   const context = useAuth();
 
-  const [email, setEmail] = useState("gustavosantanabarbosa867@gmail.com");
-  const [password, setPassword] = useState("bge091282");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   function handleSignIn() {
     context.signIn(email, password);

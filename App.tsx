@@ -11,6 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "src/hooks/auth";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Routes } from "src/routes";
+import { Order } from "src/screens/Order";
 
 export default function App() {
   const [loaded] = useFonts({
