@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Platform } from "react-native";
 
@@ -8,12 +8,26 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Home } from "src/screens/Home";
 import { Orders } from "src/screens/Orders";
 import { BottomMenu } from "src/components/BottomMenu";
-import { UserStackRoutes } from "./user.stack.routes";
+import { useAuth } from "src/hooks/auth";
+
+import firestore from "@react-native-firebase/firestore";
 
 const Tab = createBottomTabNavigator();
 
 const UserTabRoutes: React.FC = () => {
   const theme = useTheme();
+  const [notifications, setNotifications] = useState(0);
+
+  useEffect(() => {
+    const subscribe = firestore()
+      .collection("orders")
+      .where("status", "==", "Pronto")
+      .onSnapshot((querySnapshot) => {
+        setNotifications(querySnapshot.docs?.length);
+      });
+
+    return () => subscribe();
+  }, []);
 
   return (
     <Tab.Navigator
@@ -30,7 +44,7 @@ const UserTabRoutes: React.FC = () => {
     >
       <Tab.Screen
         name="home"
-        component={UserStackRoutes}
+        component={Home}
         options={{
           tabBarIcon: ({ color }) => (
             <BottomMenu title="Cardápio" color={color} />
@@ -42,7 +56,11 @@ const UserTabRoutes: React.FC = () => {
         component={Orders}
         options={{
           tabBarIcon: ({ color }) => (
-            <BottomMenu title="Pedidos" color={color} notifications="0" />
+            <BottomMenu
+              title="Pedidos"
+              color={color}
+              notifications={String(notifications)}
+            />
           ),
         }}
       />

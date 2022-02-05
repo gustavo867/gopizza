@@ -18,7 +18,7 @@ import { useAuth } from "src/hooks/auth";
 const Home: React.FC = () => {
   const theme = useTheme();
   const safeArea = useSafeAreaInsets();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   const { navigate } = useNavigation();
 
@@ -65,7 +65,9 @@ const Home: React.FC = () => {
   }
 
   function handleOpen(id: string) {
-    navigate("product", { id });
+    const route = user?.isAdmin ? "product" : "order";
+
+    navigate(route, { id });
   }
 
   useFocusEffect(
@@ -83,7 +85,7 @@ const Home: React.FC = () => {
       >
         <S.Greeting>
           <S.GreetingEmoji source={happyEmoji} />
-          <S.GreetingText>Olá, Admin</S.GreetingText>
+          <S.GreetingText>Olá, {user?.name}</S.GreetingText>
         </S.Greeting>
 
         <TouchableOpacity onPress={signOut}>
@@ -115,14 +117,16 @@ const Home: React.FC = () => {
           paddingBottom: 125,
         }}
       />
-      <S.NewProductButton
-        style={{
-          marginBottom: safeArea.bottom,
-        }}
-        title="Cadastra Pizza"
-        type="secondary"
-        onPress={handleAdd}
-      />
+      {user?.isAdmin && (
+        <S.NewProductButton
+          style={{
+            marginBottom: safeArea.bottom,
+          }}
+          title="Cadastra Pizza"
+          type="secondary"
+          onPress={handleAdd}
+        />
+      )}
     </S.Container>
   );
 };

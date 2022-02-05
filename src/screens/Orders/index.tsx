@@ -1,14 +1,36 @@
-import React from "react";
-import { FlatList, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ButtonBack } from "src/components/ButtonBack";
 import { ItemSeparator } from "src/components/ItemSeparator";
-import { OrderCard } from "src/components/OrderCard/idnex";
+import { OrderCard, OrderProps } from "src/components/OrderCard";
+
+import firestore from "@react-native-firebase/firestore";
 
 import * as S from "./styles";
+import { useAuth } from "src/hooks/auth";
 
 const Orders: React.FC = () => {
   const safeArea = useSafeAreaInsets();
+  const [orders, setOrders] = useState([] as OrderProps[]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const subscribe = firestore()
+      .collection("orders")
+      .where("waiter_id", "==", user?.id)
+      .onSnapshot((querySnapshot) => {
+        const data = querySnapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+
+        setOrders(data as OrderProps[]);
+      });
+
+    return () => subscribe();
+  }, []);
 
   return (
     <S.Container>
@@ -21,7 +43,7 @@ const Orders: React.FC = () => {
         <S.Title>Pedidos feitos</S.Title>
       </S.Header>
       <FlatList
-        data={["1", "2", "3"]}
+        data={orders}
         numColumns={2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -29,8 +51,10 @@ const Orders: React.FC = () => {
           paddingHorizontal: 24,
         }}
         ItemSeparatorComponent={() => <ItemSeparator />}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item, index }) => <OrderCard index={index} />}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => (
+          <OrderCard index={index} data={item} />
+        )}
       />
     </S.Container>
   );

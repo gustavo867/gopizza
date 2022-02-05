@@ -28,44 +28,51 @@ function useAuthValues() {
 
     setIsLogging(true);
 
-    auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((account) => {
-        firestore()
-          .collection("users")
-          .doc(account.user.uid)
-          .get()
-          .then(async (profile) => {
-            const { name, isAdmin } = profile.data() as User;
+    try {
+      const account = await auth().signInWithEmailAndPassword(email, password);
 
-            if (profile.exists) {
-              const userData = {
-                id: account.user.uid,
-                name,
-                isAdmin,
-              };
+      if (account) {
+        try {
+          const profile = await firestore()
+            .collection("users")
+            .doc(account.user.uid)
+            .get();
 
-              await AsyncStorage.setItem(
-                USER_COLLECTION,
-                JSON.stringify(userData)
-              );
+          const { name, isAdmin } = profile.data() as User;
 
-              console.log("a", userData);
+          if (profile.exists) {
+            const userData = {
+              id: account.user.uid,
+              name,
+              isAdmin,
+            };
 
-              setUser(userData);
-            }
-          });
-      })
-      .catch((error) => {
-        const { code } = error;
+            setUser(userData);
 
-        if (code === "auth/user-not-found" || code === "auth/wrong-password") {
-          return Alert.alert("Login", "E-mail e/ou senha inválida");
-        } else {
+            AsyncStorage.setItem(USER_COLLECTION, JSON.stringify(userData));
+          }
+
+          setIsLogging(false);
+        } catch (err) {
+          console.log("erro", err);
+          setIsLogging(false);
+
           return Alert.alert("Login", "Não foi possível realizar o login");
         }
-      })
-      .finally(() => setIsLogging(false));
+      }
+    } catch (err: any) {
+      console.log("ërro", err);
+
+      setIsLogging(false);
+
+      const { code } = err;
+
+      if (code === "auth/user-not-found" || code === "auth/wrong-password") {
+        return Alert.alert("Login", "E-mail e/ou senha inválida");
+      } else {
+        return Alert.alert("Login", "Não foi possível realizar o login");
+      }
+    }
   }
 
   async function signOut() {
@@ -96,16 +103,22 @@ function useAuthValues() {
   }
 
   async function loadUserStorageData() {
-    setIsLogging(true);
+    try {
+      setIsLogging(true);
 
-    const storedUser = await AsyncStorage.getItem(USER_COLLECTION);
+      const storedUser = await AsyncStorage.getItem(USER_COLLECTION);
 
-    if (storedUser) {
-      console.log("oi", JSON.parse(storedUser));
-      setUser(JSON.parse(storedUser));
+      console.log("a", storedUser);
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+
+      setIsLogging(false);
+    } catch (err) {
+      setIsLogging(false);
+      console.log("ërr", err);
     }
-
-    setIsLogging(false);
   }
 
   useEffect(() => {
